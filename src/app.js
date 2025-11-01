@@ -82,26 +82,26 @@
 // })
 
 
-const express = require('express');
-const { adminauth , userauth} = require('./Middlewares/auth'); // ✅ Correct import
-
-const app = express();
+// const express = require('express');
+// const { adminauth , userauth} = require('./Middlewares/auth'); // ✅ Correct import
+// require("./config/database")
+// const app = express();
 
 // app.use('/admin', adminauth);
 // app.use('/user', userauth);
 
 
-app.get('/getuserdata',(req,res)=>{
-throw new Error("hhhhhhh")
-    res.send("userr")
-})
+// app.get('/getuserdata',(req,res)=>{
+// throw new Error("hhhhhhh")
+//     res.send("userr")
+// })
 
 
-app.use("/",(err,req,res,next)=>{
-if(err){
-    res.status(500).send("something went wrong")
-}
-})
+// app.use("/",(err,req,res,next)=>{
+// if(err){
+//     res.status(500).send("something went wrong")
+// }
+// })
 
 
 
@@ -113,6 +113,47 @@ if(err){
 //     res.send("deleted");
 // });
 
+// app.listen(3000, () => {
+//     console.log("server connected");
+// });
+
+
+
+
+
+
+const express = require('express');
+const { adminauth, userauth } = require('./Middlewares/auth'); 
+require("./config/database");
+const User = require("./models/user");
+
+const app = express();
+
+
+app.use(express.json());
+
+
+app.post("/signup", async (req, res) => {
+  try {
+  
+    const user = new User({
+      firstName: "Ajay",
+      lastName: "Sindkar",
+      emailId: "12345",
+      password: "Rutwik111"
+    });
+
+ 
+    await user.save();
+    console.log("User added successfully");
+
+    res.send("User added successfully");
+  } catch (err) {
+    console.error("Error adding user:", err);
+    res.status(500).send("Error adding user");
+  }
+});
+
 app.listen(3000, () => {
-    console.log("server connected");
+  console.log("Server connected on port 3000");
 });
