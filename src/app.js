@@ -87,21 +87,31 @@ const { adminauth , userauth} = require('./Middlewares/auth'); // ✅ Correct im
 
 const app = express();
 
-app.use('/admin', adminauth);
-app.use('/user', userauth);
+// app.use('/admin', adminauth);
+// app.use('/user', userauth);
 
-app.get('/user',(req,res)=>{
+
+app.get('/getuserdata',(req,res)=>{
+throw new Error("hhhhhhh")
     res.send("userr")
 })
 
 
-app.get('/admin/getalldata', (req, res) => {
-    res.send("all data sent");
-});
+app.use("/",(err,req,res,next)=>{
+if(err){
+    res.status(500).send("something went wrong")
+}
+})
 
-app.get('/admin/deleteuser', (req, res) => {
-    res.send("deleted");
-});
+
+
+// app.get('/admin/getalldata', (req, res) => {
+//     res.send("all data sent");
+// });
+
+// app.get('/admin/deleteuser', (req, res) => {
+//     res.send("deleted");
+// });
 
 app.listen(3000, () => {
     console.log("server connected");
