@@ -1,6 +1,9 @@
-const express = require('express');
+// const express = require('express');
+// const { adminauth } = require('./Middlewares/auth');
 
-const app = express();
+// const app = express();
+
+
 
 
 //ab+c   //abbbbbbbbc
@@ -33,34 +36,73 @@ const app = express();
 
 
 
-app.use('/user', 
+// app.use('/user', 
     
-    [(req, res, next) => {
-    console.log("jjjj");
-   // res.send('jjjjjn')
-    next();
-}, (req, res,next) => {
-    //res.send("i got res back 1")
-     next();
-},
-(req, res,next) => {
-   // res.send("i got res back 22")
-    next();
-},
-(req, res,next) => {
-    //res.send("i got res back 2")
-     next();
-},
-(req, res,next) => {
-    res.send("i got res back")
-     next();
-},]
-)
+//     [(req, res, next) => {
+//     console.log("jjjj");
+//    res.send('jjjjjn')
+//     next();
+// }, (req, res,next) => {
+//     res.send("i got res back 1")
+//      next();
+// },
+// (req, res,next) => {
+//    res.send("i got res back 22")
+//     next();
+// },
+// (req, res,next) => {
+//     res.send("i got res back 2")
+//      next();
+// },
+// (req, res,next) => {
+//     res.send("i got res back")
+//      next();
+// },]
+// )
 
 
 
+
+//Middleware for authorisation check for both get data, delete user 
+// check auth at each api
+
+// app.use('/admin',adminauth)
+
+// app.get('/admin/getalldata',(req,res)=>{
+//     res.send("all data sent");
+// });
+
+// app.get('/admin/deleteuser',(req,res)=>{
+//     res.send("deleted");
+// });
+
+// app.listen(3000, () => {
+//     console.log("server con");
+
+// })
+
+
+const express = require('express');
+const { adminauth , userauth} = require('./Middlewares/auth'); // ✅ Correct import
+
+const app = express();
+
+app.use('/admin', adminauth);
+app.use('/user', userauth);
+
+app.get('/user',(req,res)=>{
+    res.send("userr")
+})
+
+
+app.get('/admin/getalldata', (req, res) => {
+    res.send("all data sent");
+});
+
+app.get('/admin/deleteuser', (req, res) => {
+    res.send("deleted");
+});
 
 app.listen(3000, () => {
-    console.log("server con");
-
-})
+    console.log("server connected");
+});
