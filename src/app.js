@@ -127,8 +127,9 @@ const { adminauth, userauth } = require('./Middlewares/auth');
 require("./config/database");
 const app = express();
 const User = require("./models/user");
+const {validateSignUpData} = require("./utils/validation")
 const connectDB = require('./config/database');
-
+const bcrypt = require('bcrypt');
 
 
 
@@ -137,18 +138,59 @@ app.use(express.json());//middle ware activated for all routes
 connectDB();
 
 app.post("/signup", async (req, res) => {
-
-    const user = new User(req.body);
   try {
+
+validateSignUpData(req);
+const{firstName,lastName,emailId , password} = req.body;
+
+const passwordHash = await bcrypt.hash(password,10);
+console.log(passwordHash);
+
+
+    const user = new User({
+      firstName,
+      lastName,
+      emailId,
+      password:passwordHash,
+    });
+
     await user.save();
     console.log("User added successfully");
 
     res.send("User added successfully");
   } catch (err) {
     console.error("Error adding user:", err);
-    res.status(500).send("Error adding user");
+    res.status(500).send("Errro "+err.message);
   }
 });
+
+
+//login
+
+app.post("/login",async(req,res)=>{
+  try{
+
+const{emailId,password}= req.body;
+const user =  await User.findOne({emailId:emailId});
+
+if(!user){
+  throw new Error("Invalid credentials")
+}
+const ispasswordVaid = await bcrypt.compare(password,user.password);
+
+if(ispasswordVaid){
+  res.send("Login successfully")
+}else{
+  throw new Error("Invalid credentials")
+}
+  }catch (err) {
+    console.error("Error :", err);
+    res.status(500).send("Errro "+err.message);
+  }
+})
+
+
+
 //getallusers
 app.get("/feed",async(req,res)=>{
 
@@ -211,6 +253,7 @@ const userId = req.body.userId;
   try{
 
 await User.findByIdAndUpdate({_id:userId},data)
+
 res.send(" updated successfully");
   }catch(err){
 res.status(400).send("something went wrong")
