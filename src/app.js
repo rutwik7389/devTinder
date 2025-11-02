@@ -125,25 +125,21 @@
 const express = require('express');
 const { adminauth, userauth } = require('./Middlewares/auth'); 
 require("./config/database");
-const User = require("./models/user");
-
 const app = express();
+const User = require("./models/user");
+const connectDB = require('./config/database');
 
 
-app.use(express.json());
 
+
+app.use(express.json());//middle ware activated for all routes
+
+connectDB();
 
 app.post("/signup", async (req, res) => {
-  try {
-  
-    const user = new User({
-      firstName: "Ajay",
-      lastName: "Sindkar",
-      emailId: "12345",
-      password: "Rutwik111"
-    });
 
- 
+    const user = new User(req.body);
+  try {
     await user.save();
     console.log("User added successfully");
 
@@ -153,6 +149,30 @@ app.post("/signup", async (req, res) => {
     res.status(500).send("Error adding user");
   }
 });
+//getallusers
+app.get("/feed",async(req,res)=>{
+
+  try{
+const users = await User.find({});
+res.send(users);
+  }catch(err){
+res.status(400).send("something went wrong")
+  }
+})
+
+
+// get one user
+app.get("/user",async(req,res)=>{
+const userEmail = req.body.emailId;
+  try{
+console.log(userEmail);
+const user = await User.findOne({emailId:userEmail})
+res.send(user);
+  }catch(err){
+res.status(400).send("something went wrong")
+  }
+})
+
 
 app.listen(3000, () => {
   console.log("Server connected on port 3000");

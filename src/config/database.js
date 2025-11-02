@@ -2,16 +2,12 @@ const mongoose = require("mongoose");
 
 const connectDB = async () => {
   try {
-    await mongoose.connect("mongodb://127.0.0.1:27017/devTinder", {
-      useNewUrlParser: true,
-      useUnifiedTopology: true,
-    });
-    console.log("Local MongoDB connected successfully!");
+    await mongoose.connect("mongodb://127.0.0.1:27017/devTinder");
+    console.log("✅ Local MongoDB connected successfully!");
   } catch (error) {
-    console.error(" MongoDB connection failed:", error.message);
+    console.error("❌ MongoDB connection failed:", error.message);
+    process.exit(1); // stop server if DB fails
   }
 };
-
-connectDB();
 
 module.exports = connectDB;
