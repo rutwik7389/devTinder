@@ -174,6 +174,51 @@ res.status(400).send("something went wrong")
 })
 
 
+// get user by id
+app.get("/userbyid/:id",async(req,res)=>{
+const userId = req.params.id;
+    console.log("User ID:", userId);
+  try{
+
+const user = await User.findById(userId)
+res.send(user);
+  }catch(err){
+res.status(400).send("something went wrong")
+  }
+})
+
+//deleteuserbyid
+
+app.delete("/user",async(req,res)=>{
+const userId = req.body.userId;
+    
+  try{
+
+const user = await User.findByIdAndDelete(userId)
+res.send(" deleted successfully");
+  }catch(err){
+res.status(400).send("something went wrong")
+  }
+})
+
+
+//update user patch
+
+app.patch("/user", async(req,res)=>{
+const userId = req.body.userId;
+    const data = req.body;
+
+  try{
+
+await User.findByIdAndUpdate({_id:userId},data)
+res.send(" updated successfully");
+  }catch(err){
+res.status(400).send("something went wrong")
+  }
+
+})
+
+
 app.listen(3000, () => {
   console.log("Server connected on port 3000");
 });
