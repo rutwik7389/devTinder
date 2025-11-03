@@ -131,9 +131,15 @@ const {validateSignUpData} = require("./utils/validation")
 const connectDB = require('./config/database');
 const bcrypt = require('bcrypt');
 
+const cookieParser = require('cookie-parser')
+const jwt = require('jsonwebtoken')
 
+const {} =  require('./Middlewares/auth')
 
 app.use(express.json());//middle ware activated for all routes
+
+app.use(cookieParser())
+
 
 connectDB();
 
@@ -179,6 +185,18 @@ if(!user){
 const ispasswordVaid = await bcrypt.compare(password,user.password);
 
 if(ispasswordVaid){
+
+const token = await jwt.sign({_id:user._id},"DEV@Tinder@123",{
+  expiresIn:"1d",
+})
+
+console.log(token);
+
+res.cookie("token",token,{
+  httpOnly:true,
+  secure:false,
+})
+
   res.send("Login successfully")
 }else{
   throw new Error("Invalid credentials")
@@ -191,75 +209,96 @@ if(ispasswordVaid){
 
 
 
-//getallusers
-app.get("/feed",async(req,res)=>{
+app.get("/profile",userauth ,async(req,res)=>{
 
-  try{
-const users = await User.find({});
-res.send(users);
-  }catch(err){
+
+try{
+
+  const user = req.user;
+
+  res.send(user)
+}catch(err){
 res.status(400).send("something went wrong")
-  }
+}
 })
 
 
-// get one user
-app.get("/user",async(req,res)=>{
-const userEmail = req.body.emailId;
-  try{
-console.log(userEmail);
-const user = await User.findOne({emailId:userEmail})
-res.send(user);
-  }catch(err){
-res.status(400).send("something went wrong")
-  }
+app.post("/sendConnectionRequest",userauth , async(req,res)=>{
+  console.log("sending connection request");
+  res.send(user.firstName+"Connection request sent")
 })
 
 
-// get user by id
-app.get("/userbyid/:id",async(req,res)=>{
-const userId = req.params.id;
-    console.log("User ID:", userId);
-  try{
 
-const user = await User.findById(userId)
-res.send(user);
-  }catch(err){
-res.status(400).send("something went wrong")
-  }
-})
+// //getallusers
+// app.get("/feed",userauth ,async(req,res)=>{
 
-//deleteuserbyid
+//   try{
+// const users = await User.find({});
+// res.send(users);
+//   }catch(err){
+// res.status(400).send("something went wrong")
+//   }
+// })
 
-app.delete("/user",async(req,res)=>{
-const userId = req.body.userId;
+
+// // get one user
+// app.get("/user",async(req,res)=>{
+// const userEmail = req.body.emailId;
+//   try{
+// console.log(userEmail);
+// const user = await User.findOne({emailId:userEmail})
+// res.send(user);
+//   }catch(err){
+// res.status(400).send("something went wrong")
+//   }
+// })
+
+
+// // get user by id
+// app.get("/userbyid/:id",userauth ,async(req,res)=>{
+// const userId = req.params.id;
+//     console.log("User ID:", userId);
+//   try{
+
+// const user = await User.findById(userId)
+// res.send(user);
+//   }catch(err){
+// res.status(400).send("something went wrong")
+//   }
+// })
+
+// //deleteuserbyid
+
+// app.delete("/user",userauth ,async(req,res)=>{
+// const userId = req.body.userId;
     
-  try{
+//   try{
 
-const user = await User.findByIdAndDelete(userId)
-res.send(" deleted successfully");
-  }catch(err){
-res.status(400).send("something went wrong")
-  }
-})
+// const user = await User.findByIdAndDelete(userId)
+// res.send(" deleted successfully");
+//   }catch(err){
+// res.status(400).send("something went wrong")
+//   }
+// })
 
 
-//update user patch
+// //update user patch
 
-app.patch("/user", async(req,res)=>{
-const userId = req.body.userId;
-    const data = req.body;
+// app.patch("/user",userauth , async(req,res)=>{
+// const userId = req.body.userId;
+//     const data = req.body;
 
-  try{
+//   try{
 
-await User.findByIdAndUpdate({_id:userId},data)
+// await User.findByIdAndUpdate({_id:userId},data)
 
-res.send(" updated successfully");
-  }catch(err){
-res.status(400).send("something went wrong")
-  }
+// res.send(" updated successfully");
+//   }catch(err){
+// res.status(400).send("something went wrong")
+//   }
 
-})
+// })
 
 
 app.listen(3000, () => {
