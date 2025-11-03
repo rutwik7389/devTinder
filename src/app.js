@@ -123,16 +123,16 @@
 
 
 const express = require('express');
-const { adminauth, userauth } = require('./Middlewares/auth'); 
+
 require("./config/database");
 const app = express();
-const User = require("./models/user");
-const {validateSignUpData} = require("./utils/validation")
+
+
 const connectDB = require('./config/database');
-const bcrypt = require('bcrypt');
+
 
 const cookieParser = require('cookie-parser')
-const jwt = require('jsonwebtoken')
+
 
 const {} =  require('./Middlewares/auth')
 
@@ -140,92 +140,25 @@ app.use(express.json());//middle ware activated for all routes
 
 app.use(cookieParser())
 
+const AuthRouter = require('./routes/auth')
+const profileRouter = require('./routes/profile')
+const requestRouter = require('./routes/request')
+
+app.use('/',AuthRouter);
+app.use('/',profileRouter)
+app.use('/',requestRouter)
+
 
 connectDB();
 
-app.post("/signup", async (req, res) => {
-  try {
-
-validateSignUpData(req);
-const{firstName,lastName,emailId , password} = req.body;
-
-const passwordHash = await bcrypt.hash(password,10);
-console.log(passwordHash);
-
-
-    const user = new User({
-      firstName,
-      lastName,
-      emailId,
-      password:passwordHash,
-    });
-
-    await user.save();
-    console.log("User added successfully");
-
-    res.send("User added successfully");
-  } catch (err) {
-    console.error("Error adding user:", err);
-    res.status(500).send("Errro "+err.message);
-  }
-});
-
-
-//login
-
-app.post("/login",async(req,res)=>{
-  try{
-
-const{emailId,password}= req.body;
-const user =  await User.findOne({emailId:emailId});
-
-if(!user){
-  throw new Error("Invalid credentials")
-}
-const ispasswordVaid = await bcrypt.compare(password,user.password);
-
-if(ispasswordVaid){
-
-const token = await user.getJWT();
-
-
-console.log(token);
-
-res.cookie("token",token,{
-  httpOnly:true,
-  secure:false,
-})
-
-  res.send("Login successfully")
-}else{
-  throw new Error("Invalid credentials")
-}
-  }catch (err) {
-    console.error("Error :", err);
-    res.status(500).send("Errro "+err.message);
-  }
-})
 
 
 
-app.get("/profile",userauth ,async(req,res)=>{
 
 
-try{
-
-  const user = req.user;
-
-  res.send(user)
-}catch(err){
-res.status(400).send("something went wrong")
-}
-})
 
 
-app.post("/sendConnectionRequest",userauth , async(req,res)=>{
-  console.log("sending connection request");
-  res.send(user.firstName+"Connection request sent")
-})
+
 
 
 
