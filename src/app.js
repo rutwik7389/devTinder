@@ -186,9 +186,8 @@ const ispasswordVaid = await bcrypt.compare(password,user.password);
 
 if(ispasswordVaid){
 
-const token = await jwt.sign({_id:user._id},"DEV@Tinder@123",{
-  expiresIn:"1d",
-})
+const token = await user.getJWT();
+
 
 console.log(token);
 
